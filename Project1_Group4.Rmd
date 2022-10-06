@@ -1,6 +1,6 @@
 ---
 title: "Project1"
-author: "Sophie Shao"
+author: "Sophie Shao, Sophia Yang"
 date: "10/6/2022"
 output: html_document
 ---
