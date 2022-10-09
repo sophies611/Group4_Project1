@@ -74,22 +74,26 @@ summary(tele_train)
 
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
 
+## Libraries
+```{r}
+library(neuralnet)
+library(gmodels)
+library(caret)
+library(class)
+threshold <- 0.6
+```
+
 ## ANN Model
 ```{r}
 teleann_train <- tele_norm[-test_set,]
 teleann_test <- tele_norm[test_set,]
-library(neuralnet)
 teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train)
 plot(teleann_model)
 ```
 
 ## Evaluate ANN Model
 ```{r, cache=TRUE}
-library(gmodels)
-library(caret)
-library(class)
 teleann_pred <- predict(teleann_model, tele_test)
-threshold <- 0.6
 teleann_pred <- ifelse(teleann_pred < threshold, 0, 1)
 
 CrossTable(x = teleann_test$yyes, y = teleann_pred, prop.chisq=FALSE)
@@ -117,31 +121,17 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 ```{r}
 str(tele)
 summary(tele)
-
-## Getting Train and Test Samples for logistic regression
 ```
 
+## Getting Train and Test Samples for logistic regression
 ```{r}
-# Selects 10000 random rows for test data
-set.seed(12345)
-test_set_log <- sample(1:nrow(tele), 10000) 
-# Depending on R-version and computer, different rows may be selected. 
-# If that happens, results are different.
-
-# Create a train set and test set
-#First the predictors - all columns except the yyes column
-tele_train_log <- tele[-test_set_log, ]
-tele_test_log <- tele[test_set_log, -match("y",names(tele))]
-
-
-#Now the response (aka Labels) - only the y column
-tele_train_labels_log <- tele[-test_set_log, "y"]
-tele_test_labels_log <- tele[test_set_log, "y"]
-summary(tele_train_log)
-str(tele_train_log)
-
-tele_log_model <- glm(y~ ., data=tele_train_log, family="binomial")
-summary(tele_log_model)
-
-predict_values <- predict(tele_log_model, newdata=tele_test_log, type="response")
+#tele_log_model <- glm(y~ age +job + education, data=tele_train_log, family="binomial")
+tele_train$y <- tele_train_labels
+tele_test$y <- tele_test_labels
+tele_log_model <- glm(y~., data = tele_train, family = "binomial")
+#summary(tele_log_model)
+predict_values <- predict(tele_log_model, newdata=tele_test, type="response")
+modpred <- as.factor(ifelse(predict_values <= threshold, 0, 1))
+CrossTable(x = tele_test_labels, y = modpred, prop.chisq=FALSE)
+confusionMatrix(modpred, as.factor(tele_test_labels), positive = "1")
 ```
