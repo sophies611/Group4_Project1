@@ -119,13 +119,14 @@ str(tele)
 summary(tele)
 
 ## Getting Train and Test Samples for logistic regression
+```
 
 ```{r}
 # Selects 10000 random rows for test data
 set.seed(12345)
 test_set_log <- sample(1:nrow(tele), 10000) 
 # Depending on R-version and computer, different rows may be selected. 
-# If that happens, results are different. 
+# If that happens, results are different.
 
 # Create a train set and test set
 #First the predictors - all columns except the yyes column
