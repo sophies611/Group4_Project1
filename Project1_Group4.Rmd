@@ -84,19 +84,31 @@ plot(teleann_model)
 ```
 
 ## Evaluate ANN Model
-```{r}
+```{r, cache=TRUE}
 library(gmodels)
 library(caret)
 library(class)
-Ann_pred <- predict(teleann_model, tele_test)
+teleann_pred <- predict(teleann_model, tele_test)
 threshold <- 0.6
-predicted_yyes <- ifelse(predicted_yyes < threshold, 0, 1)
+teleann_pred <- ifelse(teleann_pred < threshold, 0, 1)
 
-CrossTable(x = teleann_test$yyes, y = predicted_yyes, prop.chisq=FALSE)
-confusionMatrix(as.factor(predicted_yyes), as.factor(teleann_test$yyes), positive = "1")
+CrossTable(x = teleann_test$yyes, y = teleann_pred, prop.chisq=FALSE)
+confusionMatrix(as.factor(teleann_pred), as.factor(teleann_test$yyes), positive = "1")
 ```
 
 ## Improve ANN Model
 ```{r, cache=TRUE}
-teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = 5)
+#teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = 5)
+```
+
+## KNN Model & Evaluation
+```{r, cache=TRUE}
+teleknn_pred <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = sqrt(nrow(tele_train)))
+CrossTable(x = tele_test_labels, y = teleknn_pred, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive = "1")
+```
+
+## Improve KNN Model
+```{r}
+#To be finished..
 ```
