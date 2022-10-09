@@ -100,3 +100,45 @@ confusionMatrix(as.factor(predicted_yyes), as.factor(teleann_test$yyes), positiv
 ```{r, cache=TRUE}
 teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = 5)
 ```
+
+
+# KNN Model
+
+
+# Logistic Regression
+
+```{r}
+str(tele)
+summary(tele)
+
+## Getting Train and Test Samples for logistic regression
+
+```{r}
+# Selects 10000 random rows for test data
+set.seed(12345)
+test_set_log <- sample(1:nrow(tele), 10000) 
+# Depending on R-version and computer, different rows may be selected. 
+# If that happens, results are different. 
+
+# Create a train set and test set
+#First the predictors - all columns except the yyes column
+tele_train_log <- tele[-test_set_log, ]
+tele_test_log <- tele[test_set_log, -match("y",names(tele))]
+
+
+#Now the response (aka Labels) - only the y column
+tele_train_labels_log <- tele[-test_set_log, "y"]
+tele_test_labels_log <- tele[test_set_log, "y"]
+summary(tele_train_log)
+str(tele_train_log)
+
+tele_log_model <- glm(y~ ., data=tele_train_log, family="binomial")
+summary(tele_log_model)
+
+predict_values <- predict(tele_log_model, newdata=tele_test_log, type="response")
+```
+
+
+
+
+
