@@ -1,6 +1,6 @@
 ---
 title: "Project1"
-author: "Sophie Shao, Sophia Yang, Han (Andy) Xu, "
+author: "Sophie Shao, Sophia Yang, Han (Andy) Xu, Ken Bai"
 date: "10/6/2022"
 output: html_document
 ---
