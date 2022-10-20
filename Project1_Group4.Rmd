@@ -180,7 +180,9 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 
 ## Improve KNN Model
 ```{r}
-#To be finished..
+teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
+CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
 ```
 
 ## Logistic Regression
