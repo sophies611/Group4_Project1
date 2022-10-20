@@ -106,23 +106,36 @@ aggregate(data=tele_norm_cluster, yyes~cluster, mean)
 #combined: if 2/3 models say 1, it will be 1
 
 
-
+str(tele_norm_cluster$cluster)
 #create 4 datasets
 
-cluster_1 <- tele_norm_cluster[tele_norm_cluster$cluster==1]
-cluster_2 <- tele_norm_cluster[tele_norm_cluster$cluster==1]
-cluster_3 <- tele_norm_cluster[tele_norm_cluster$cluster==1]
-cluster_4 <- tele_norm_cluster[tele_norm_cluster$cluster==1]
-cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==1]
+cluster_1 <- tele_norm_cluster[tele_norm_cluster$cluster==1,]
+cluster_2 <- tele_norm_cluster[tele_norm_cluster$cluster==2,]
+cluster_3 <- tele_norm_cluster[tele_norm_cluster$cluster==3,]
+cluster_4 <- tele_norm_cluster[tele_norm_cluster$cluster==4,]
+cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ```
 
 
-## Cluster 1
+### Cluster 1
 
 ```{r}
+set.seed(12345)
+test_set <- sample(1:nrow(cluster_1), 10000) 
+teleann_train_1 <- cluster_1[-test_set,]
+teleann_test_1 <- cluster_1[test_set,]
+teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3))
+plot(teleann_model)
 
 ```
 
+### Cluster 2
+
+### Cluster 3
+
+### Cluster 4
+
+### Cluster 5
 
 
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
