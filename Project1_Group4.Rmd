@@ -180,6 +180,7 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 
 ## Improve KNN Model
 ```{r}
+#We want to lower the k value because the data is skewed, and we ended up with k = 70 since it yields the best performing model
 teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
 CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
