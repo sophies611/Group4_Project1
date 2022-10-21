@@ -58,7 +58,7 @@ tele_norm <- as.data.frame(lapply(tele_random, normalize))
 ```{r}
 # Selects 10000 random rows for test data
 set.seed(12345)
-test_set <- sample(1:nrow(tele_norm), 10000) 
+test_set <- sample(1:nrow(tele_norm), 10000)
 # Depending on R-version and computer, different rows may be selected. 
 # If that happens, results are different. 
 
@@ -131,14 +131,14 @@ plot(teleann_model)
 
 ```{r}
 set.seed(12345)
-test_set2 <- sample(1:nrow(cluster_2), 5000) 
-tele_train_labels2 <- tele_norm[-test_set2, "yyes"]
-tele_test_labels2 <- tele_norm[test_set2, "yyes"]
+test_set2 <- sample(1:nrow(cluster_2), 5000)
+tele_train_labels2 <- cluster_2[-test_set2, "yyes"]
+tele_test_labels2 <- cluster_2[test_set2, "yyes"]
 teleknn_train_2 <- cluster_2[-test_set2,]
 teleknn_test_2 <- cluster_2[test_set2,]
-teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = 70)
-plot(teleknn_model2)
-
+#teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(tele_train)))
+#CrossTable(x = tele_test_labels2, y = teleknn_model2, prop.chisq = FALSE)
+#confusionMatrix(as.factor(teleknn_model2), as.factor(tele_test_labels2), positive = "1")
 ```
 
 ### Cluster 3
