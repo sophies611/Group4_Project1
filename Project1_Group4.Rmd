@@ -136,12 +136,23 @@ tele_train_labels2 <- cluster_2[-test_set2, "yyes"]
 tele_test_labels2 <- cluster_2[test_set2, "yyes"]
 teleknn_train_2 <- cluster_2[-test_set2,]
 teleknn_test_2 <- cluster_2[test_set2,]
-#teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(tele_train)))
-#CrossTable(x = tele_test_labels2, y = teleknn_model2, prop.chisq = FALSE)
-#confusionMatrix(as.factor(teleknn_model2), as.factor(tele_test_labels2), positive = "1")
+teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(teleknn_train_2)))
+CrossTable(x = tele_test_labels2, y = teleknn_model2, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model2), as.factor(tele_test_labels2), positive = "1")
 ```
 
 ### Cluster 3
+```{r}
+set.seed(12345)
+test_set3 <- sample(1:nrow(cluster_3), 5000)
+tele_train_labels3 <- cluster_3[-test_set3, "yyes"]
+tele_test_labels3 <- cluster_3[test_set3, "yyes"]
+teleknn_train_3 <- cluster_3[-test_set3,]
+teleknn_test_3 <- cluster_3[test_set3,]
+teleknn_model3 <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = sqrt(nrow(teleknn_train_3)))
+CrossTable(x = tele_test_labels3, y = teleknn_model3, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model3), as.factor(tele_test_labels3), positive = "1")
+```
 
 ### Cluster 4
 
