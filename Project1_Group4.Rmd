@@ -165,7 +165,34 @@ confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3)
 
 ### Cluster 4
 
+```{r}
+set.seed(12345)
+test_set4 <- sample(1:nrow(cluster_4), 5000)
+tele_train_labels4 <- cluster_4[-test_set4, "yyes"]
+tele_test_labels4 <- cluster_4[test_set4, "yyes"]
+teleknn_train_4 <- cluster_4[-test_set4,]
+teleknn_test_4 <- cluster_4[test_set4,]
+#teleknn_model4 <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = sqrt(nrow(teleknn_train_4)))
+teleknn_model4_improved <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = 1)
+CrossTable(x = tele_test_labels4, y = teleknn_model4_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels4), positive = "1")
+```
+
 ### Cluster 5
+
+```{r}
+set.seed(12345)
+test_set5 <- sample(1:nrow(cluster_5), 5000)
+tele_train_labels5 <- cluster_5[-test_set5, "yyes"]
+tele_test_labels5 <- cluster_5[test_set5, "yyes"]
+teleknn_train_5 <- cluster_5[-test_set5,]
+teleknn_test_5 <- cluster_5[test_set5,]
+#teleknn_model5 <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = sqrt(nrow(teleknn_train_5)))
+teleknn_model5_improved <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = 1)
+CrossTable(x = tele_test_labels5, y = teleknn_model5_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels5), positive = "1")
+```
+
 
 
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
