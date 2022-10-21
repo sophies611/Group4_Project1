@@ -71,8 +71,6 @@ tele_test <- tele_norm[test_set, -match("yyes",names(tele_norm))]
 tele_train_labels <- tele_norm[-test_set, "yyes"]
 tele_test_labels <- tele_norm[test_set, "yyes"]
 summary(tele_train)
-
-
 ```
 
 
@@ -130,6 +128,18 @@ plot(teleann_model)
 ```
 
 ### Cluster 2
+
+```{r}
+set.seed(12345)
+test_set2 <- sample(1:nrow(cluster_2), 5000) 
+tele_train_labels2 <- tele_norm[-test_set2, "yyes"]
+tele_test_labels2 <- tele_norm[test_set2, "yyes"]
+teleknn_train_2 <- cluster_2[-test_set2,]
+teleknn_test_2 <- cluster_2[test_set2,]
+teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = 70)
+plot(teleknn_model2)
+
+```
 
 ### Cluster 3
 
