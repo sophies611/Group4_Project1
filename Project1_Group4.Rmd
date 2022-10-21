@@ -120,12 +120,19 @@ cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ### Cluster 1
 
 ```{r}
+
+nrow(tele_norm)
 set.seed(12345)
-test_set <- sample(1:nrow(cluster_1), 10000) 
+test_set <- sample(1:nrow(cluster_1), 1000) 
 teleann_train_1 <- cluster_1[-test_set,]
 teleann_test_1 <- cluster_1[test_set,]
 teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3))
 plot(teleann_model)
+
+
+
+
+
 
 ```
 
