@@ -58,7 +58,7 @@ tele_norm <- as.data.frame(lapply(tele_random, normalize))
 ```{r}
 # Selects 10000 random rows for test data
 set.seed(12345)
-test_set <- sample(1:nrow(tele_norm), 10000) 
+test_set <- sample(1:nrow(tele_norm), 10000)
 # Depending on R-version and computer, different rows may be selected. 
 # If that happens, results are different. 
 
@@ -71,11 +71,16 @@ tele_test <- tele_norm[test_set, -match("yyes",names(tele_norm))]
 tele_train_labels <- tele_norm[-test_set, "yyes"]
 tele_test_labels <- tele_norm[test_set, "yyes"]
 summary(tele_train)
-
-
 ```
 
-
+## Libraries
+```{r}
+library(neuralnet)
+library(gmodels)
+library(caret)
+library(class)
+threshold <- 0.6
+```
 
 ## clustering
 
@@ -138,23 +143,66 @@ plot(teleann_model)
 
 ### Cluster 2
 
+```{r, cache=TRUE}
+set.seed(12345)
+test_set2 <- sample(1:nrow(cluster_2), 5000)
+tele_train_labels2 <- cluster_2[-test_set2, "yyes"]
+tele_test_labels2 <- cluster_2[test_set2, "yyes"]
+teleknn_train_2 <- cluster_2[-test_set2,]
+teleknn_test_2 <- cluster_2[test_set2,]
+#teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(teleknn_train_2)))
+teleknn_model2_improved <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = 5)
+CrossTable(x = tele_test_labels2, y = teleknn_model2_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels2), positive = "1")
+```
+
 ### Cluster 3
+```{r, cache=TRUE}
+set.seed(12345)
+test_set3 <- sample(1:nrow(cluster_3), 5000)
+tele_train_labels3 <- cluster_3[-test_set3, "yyes"]
+tele_test_labels3 <- cluster_3[test_set3, "yyes"]
+teleknn_train_3 <- cluster_3[-test_set3,]
+teleknn_test_3 <- cluster_3[test_set3,]
+#teleknn_model3 <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = sqrt(nrow(teleknn_train_3)))
+teleknn_model3_improved <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = 5)
+CrossTable(x = tele_test_labels3, y = teleknn_model3_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3), positive = "1")
+```
 
 ### Cluster 4
 
+```{r}
+set.seed(12345)
+test_set4 <- sample(1:nrow(cluster_4), 5000)
+tele_train_labels4 <- cluster_4[-test_set4, "yyes"]
+tele_test_labels4 <- cluster_4[test_set4, "yyes"]
+teleknn_train_4 <- cluster_4[-test_set4,]
+teleknn_test_4 <- cluster_4[test_set4,]
+#teleknn_model4 <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = sqrt(nrow(teleknn_train_4)))
+teleknn_model4_improved <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = 1)
+CrossTable(x = tele_test_labels4, y = teleknn_model4_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels4), positive = "1")
+```
+
 ### Cluster 5
+
+```{r}
+set.seed(12345)
+test_set5 <- sample(1:nrow(cluster_5), 5000)
+tele_train_labels5 <- cluster_5[-test_set5, "yyes"]
+tele_test_labels5 <- cluster_5[test_set5, "yyes"]
+teleknn_train_5 <- cluster_5[-test_set5,]
+teleknn_test_5 <- cluster_5[test_set5,]
+#teleknn_model5 <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = sqrt(nrow(teleknn_train_5)))
+teleknn_model5_improved <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = 1)
+CrossTable(x = tele_test_labels5, y = teleknn_model5_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels5), positive = "1")
+```
+
 
 
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
-
-## Libraries
-```{r}
-library(neuralnet)
-library(gmodels)
-library(caret)
-library(class)
-threshold <- 0.6
-```
 
 ## ANN Model
 ```{r}
@@ -187,7 +235,10 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 
 ## Improve KNN Model
 ```{r}
-#To be finished..
+#We want to lower the k value because the data is skewed, and we ended up with k = 70 since it yields the best performing model
+teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
+CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
 ```
 
 ## Logistic Regression
