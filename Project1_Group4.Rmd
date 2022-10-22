@@ -1,6 +1,6 @@
 ---
 title: "Project1"
-author: "Sophie Shao, Sophia Yang, Han (Andy) Xu, Ken Bai"
+author: "Sophie Shao, Sophia Yang, Han (Andy) Xu, Ken Bai, Shenyi (Elaine) Ge"
 date: "10/6/2022"
 output: html_document
 ---
@@ -106,7 +106,7 @@ tele_norm_cluster$yyes <- tele_norm$yyes
 tapply(tele_norm_cluster$yyes, tele_norm_cluster$cluster, mean)
 aggregate(data=tele_norm_cluster, yyes~cluster, mean)
 
-#use 4 datasets for 4 clusters, 3 models eaach dataset
+#use 4 datasets for 4 clusters, 3 models each dataset
 
 #combined: if 2/3 models say 1, it will be 1
 
@@ -122,108 +122,53 @@ cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ```
 
 
-### Cluster 1
-
-```{r}
-
-nrow(tele_norm)
-set.seed(12345)
-test_set <- sample(1:nrow(cluster_1), 1000) 
-teleann_train_1 <- cluster_1[-test_set,]
-teleann_test_1 <- cluster_1[test_set,]
-teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3))
-plot(teleann_model)
-
-
-
-
-
-
-```
-
-### Cluster 2
-
-```{r, cache=TRUE}
-set.seed(12345)
-test_set2 <- sample(1:nrow(cluster_2), 5000)
-tele_train_labels2 <- cluster_2[-test_set2, "yyes"]
-tele_test_labels2 <- cluster_2[test_set2, "yyes"]
-teleknn_train_2 <- cluster_2[-test_set2,]
-teleknn_test_2 <- cluster_2[test_set2,]
-#teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(teleknn_train_2)))
-teleknn_model2_improved <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = 5)
-CrossTable(x = tele_test_labels2, y = teleknn_model2_improved, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels2), positive = "1")
-```
-
-### Cluster 3
-```{r, cache=TRUE}
-set.seed(12345)
-test_set3 <- sample(1:nrow(cluster_3), 5000)
-tele_train_labels3 <- cluster_3[-test_set3, "yyes"]
-tele_test_labels3 <- cluster_3[test_set3, "yyes"]
-teleknn_train_3 <- cluster_3[-test_set3,]
-teleknn_test_3 <- cluster_3[test_set3,]
-#teleknn_model3 <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = sqrt(nrow(teleknn_train_3)))
-teleknn_model3_improved <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = 5)
-CrossTable(x = tele_test_labels3, y = teleknn_model3_improved, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3), positive = "1")
-```
-
-### Cluster 4
-
-```{r}
-set.seed(12345)
-test_set4 <- sample(1:nrow(cluster_4), 5000)
-tele_train_labels4 <- cluster_4[-test_set4, "yyes"]
-tele_test_labels4 <- cluster_4[test_set4, "yyes"]
-teleknn_train_4 <- cluster_4[-test_set4,]
-teleknn_test_4 <- cluster_4[test_set4,]
-#teleknn_model4 <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = sqrt(nrow(teleknn_train_4)))
-teleknn_model4_improved <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = 1)
-CrossTable(x = tele_test_labels4, y = teleknn_model4_improved, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels4), positive = "1")
-```
-
-### Cluster 5
-
-```{r}
-set.seed(12345)
-test_set5 <- sample(1:nrow(cluster_5), 5000)
-tele_train_labels5 <- cluster_5[-test_set5, "yyes"]
-tele_test_labels5 <- cluster_5[test_set5, "yyes"]
-teleknn_train_5 <- cluster_5[-test_set5,]
-teleknn_test_5 <- cluster_5[test_set5,]
-#teleknn_model5 <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = sqrt(nrow(teleknn_train_5)))
-teleknn_model5_improved <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = 1)
-CrossTable(x = tele_test_labels5, y = teleknn_model5_improved, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels5), positive = "1")
-```
-
-
-
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
 
-## ANN Model
+### ANN Model
 ```{r}
 teleann_train <- tele_norm[-test_set,]
-teleann_test <- tele_norm[test_set,]
-teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3))
+teleann_test <- tele_norm[test_set,-match("yyes",names(tele_norm))]
+tele_train_labels <- tele_norm[-test_set, "yyes"]
+tele_test_labels <- tele_norm[test_set, "yyes"]
+teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train)
 plot(teleann_model)
 ```
 
-## Evaluate ANN Model
+### Evaluate ANN Model
 ```{r, cache=TRUE}
 teleann_pred <- predict(teleann_model, tele_test)
 teleann_pred <- ifelse(teleann_pred < threshold, 0, 1)
-
 CrossTable(x = teleann_test$yyes, y = teleann_pred, prop.chisq=FALSE)
 model1results=confusionMatrix(as.factor(teleann_pred), as.factor(teleann_test$yyes), positive = "1")
 ```
 
-## Improve ANN Model
+### Improve ANN Model
 ```{r, cache=TRUE}
-#teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = 5)
+teleann_model_improved <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = c(5,3))
+
+teleann_model_1 <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2), threshold=0.1)
+
+teleann_model_1a <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2,2), threshold=0.1, stepmax=10^6)
+
+teleann_model_1b <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(1), threshold=0.1, stepmax=10^6, learningrate=0.01)
+
+teleann_model_1c <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5), threshold=0.01)
+
+teleann_model_1d <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,2), threshold=0.05)
+
+teleann_model_1e <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(1,2), threshold=0.1, stepmax=10^10, learningrate=0.01)
+
+
+teleann_model_1g <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(10,5), threshold=0.1, stepmax=10^10, learningrate=0.001)
+
+teleann_model_1h <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3), threshold=0.01)
+```
+
+### Final ANN Model
+
+```{r, cache=TRUE}
+teleann_model <- neuralnet(formula = yyes ~ ., data = tele_ann_train_1, hidden=c(2), threshold=0.01, stepmax=10^10, learningrate=0.001)
+
 ```
 
 ## KNN Model & Evaluation
@@ -239,8 +184,6 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
 CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
-```
-
 ## Logistic Regression
 ```{r}
 str(tele)
@@ -259,3 +202,167 @@ modpred <- as.factor(ifelse(predict_values <= threshold, 0, 1))
 CrossTable(x = tele_test_labels, y = modpred, prop.chisq=FALSE)
 confusionMatrix(modpred, as.factor(tele_test_labels), positive = "1")
 ```
+
+
+
+### Cluster 1
+
+```{r}
+
+#ANN model
+
+test_set1 <- sample(1:nrow(cluster_1), 1000) 
+tele_train_labels1 <- cluster_1[-test_set1, "yyes"]
+tele_test_labels1 <- cluster_1[test_set1, "yyes"] #KNN needs outcome in both
+tele_ann_train_1 <- cluster_1[-test_set1, ]
+tele_ann_train_1$yyes <- ifelse(tele_ann_train_1$yyes > 0, .9, .1) #only for ANN & logistic
+tele_test_1 <- cluster_1[test_set1,-match("yyes",names(cluster_1))]
+
+plot(teleann_model_1)
+model_results <- compute(teleann_model_1, teleann_test_1)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+model_results <- ifelse(predicted_strength>threshold, 1,0) #convert thresholds
+# examine the correlation between predicted and actual values
+cor(predicted_strength, tele_test_labels1)
+CrossTable(x = tele_test_labels1, y = model_results, prop.chisq = FALSE)
+confusionMatrix(as.factor(model_results), as.factor(tele_test_labels1), positive = "1")
+
+#KNN labels should be separated
+
+model_results <- compute(teleann_model_1h, teleann_test_1)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+model_results <- ifelse(predicted_strength>threshold, 1,0) #convert thresholds
+# examine the correlation between predicted and actual values
+cor(model_results, tele_test_labels1)
+CrossTable(x = tele_test_labels1, y = model_results, prop.chisq = FALSE)
+confusionMatrix(as.factor(model_results), as.factor(tele_test_labels1), positive = "1")
+
+```
+
+### Cluster 2
+
+```{r, cache=TRUE}
+set.seed(12345)
+test_set2 <- sample(1:nrow(cluster_2), 2500)
+tele_train_labels2 <- cluster_2[-test_set2, "yyes"]
+tele_test_labels2 <- cluster_2[test_set2, "yyes"]
+teleknn_train_2 <- cluster_2[-test_set2,]
+teleknn_test_2 <- cluster_2[test_set2,]
+#teleknn_model2 <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = sqrt(nrow(teleknn_train_2)))
+teleknn_model2_improved <- knn(train = teleknn_train_2, test = teleknn_test_2, cl = tele_train_labels2, k = 5)
+CrossTable(x = tele_test_labels2, y = teleknn_model2_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels2), positive = "1")
+
+#ANN Model
+tele_ann_train_2 <- cluster_2[-test_set2, ]
+tele_test_2 <- cluster_2[test_set2,-match("yyes",names(cluster_2))]
+tele_ann_train_2$yyes <- ifelse(tele_ann_train_2$yyes > 0, .9, .1) #only for ANN
+teleann_model2 <- neuralnet(formula = yyes ~ ., data = tele_train_2, hidden=c(5,3))
+plot(teleann_model_2)
+
+model_results <- compute(teleann_model_2, tele_test_2)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+# examine the correlation between predicted and actual values
+cor(predicted_strength, tele_test_labels2)
+CrossTable(x = tele_test_labels2, y = teleann_model2, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleann_model2), as.factor(tele_test_labels2), positive = "1")
+
+```
+
+### Cluster 3
+```{r, cache=TRUE}
+set.seed(12345)
+test_set3 <- sample(1:nrow(cluster_3), 2500)
+tele_train_labels3 <- cluster_3[-test_set3, "yyes"]
+tele_test_labels3 <- cluster_3[test_set3, "yyes"]
+tele_train_3 <- cluster_3[-test_set3,]
+tele_test_3 <- cluster_3[test_set3,]
+#teleknn_model3 <- knn(train = teleknn_train_3, test = teleknn_test_3, cl = tele_train_labels3, k = sqrt(nrow(teleknn_train_3)))
+teleknn_model3_improved <- knn(train = tele_train_3, test = tele_test_3, cl = tele_train_labels3, k = 5)
+CrossTable(x = tele_test_labels3, y = teleknn_model3_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3), positive = "1")
+
+#ANN Model
+
+tele_ann_train_3 <- cluster_3[-test_set3, ]
+tele_test_3 <- cluster_3[test_set3,-match("yyes",names(cluster_3))]
+tele_ann_train_3$yyes <- ifelse(tele_ann_train_3$yyes > 0, .9, .1) #only for ANN
+teleann_model3 <- neuralnet(formula = yyes ~ ., data = tele_train_3, hidden=c(5,3))
+plot(teleann_model_3)
+
+model_results <- compute(teleann_model3, tele_test_3)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+# examine the correlation between predicted and actual values
+cor(predicted_strength, tele_test_labels3)
+CrossTable(x = tele_test_labels3, y = teleann_model3, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleann_model3), as.factor(tele_test_labels3), positive = "1")
+```
+
+### Cluster 4
+
+```{r}
+set.seed(12345)
+test_set4 <- sample(1:nrow(cluster_4), 1500)
+tele_train_labels4 <- cluster_4[-test_set4, "yyes"]
+tele_test_labels4 <- cluster_4[test_set4, "yyes"]
+teleknn_train_4 <- cluster_4[-test_set4,]
+teleknn_test_4 <- cluster_4[test_set4,]
+#teleknn_model4 <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = sqrt(nrow(teleknn_train_4)))
+teleknn_model4_improved <- knn(train = teleknn_train_4, test = teleknn_test_4, cl = tele_train_labels4, k = 1)
+CrossTable(x = tele_test_labels4, y = tele_model4_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels4), positive = "1")
+
+
+#ANN Model
+tele_ann_train_4 <- cluster_4[-test_set4, ]
+tele_test_4 <- cluster_4[test_set4,-match("yyes",names(cluster_4))]
+tele_ann_train_4$yyes <- ifelse(tele_ann_train_4$yyes > 0, .9, .1) #only for ANN
+
+teleann_model4 <- neuralnet(formula = yyes ~ ., data = tele_train_4, hidden=c(5,3))
+plot(teleann_model_4)
+
+model_results <- compute(teleann_model4, tele_test_4)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+# examine the correlation between predicted and actual values
+cor(predicted_strength, tele_test_labels4)
+CrossTable(x = tele_test_labels4, y = teleann_model4, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleann_model4), as.factor(tele_test_labels4), positive = "1")
+```
+
+### Cluster 5
+
+```{r}
+set.seed(12345)
+test_set5 <- sample(1:nrow(cluster_5), 2500)
+tele_train_labels5 <- cluster_5[-test_set5, "yyes"]
+tele_test_labels5 <- cluster_5[test_set5, "yyes"]
+teleknn_train_5 <- cluster_5[-test_set5,]
+teleknn_test_5 <- cluster_5[test_set5,]
+#teleknn_model5 <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = sqrt(nrow(teleknn_train_5)))
+teleknn_model5_improved <- knn(train = teleknn_train_5, test = teleknn_test_5, cl = tele_train_labels5, k = 1)
+CrossTable(x = tele_test_labels5, y = tele_model5_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(tele_model5_improved), as.factor(tele_test_labels5), positive = "1")
+
+#ANN Model
+
+tele_ann_train_5 <- cluster_5[-test_set5, ]
+tele_test_5 <- cluster_5[test_set5,-match("yyes",names(cluster_5))]
+tele_ann_train_5$yyes <- ifelse(tele_ann_train_5$yyes > 0, .9, .1) #only for ANN
+teleann_model5 <- neuralnet(formula = yyes ~ ., data = tele_train_5, hidden=c(5,3))
+plot(teleann_model_5)
+
+model_results <- compute(teleann_model5, tele_test_5)
+# obtain predicted strength values
+predicted_strength <- model_results$net.result
+# examine the correlation between predicted and actual values
+cor(predicted_strength, tele_test_labels5)
+CrossTable(x = tele_test_labels5, y = teleann_model5, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleann_model5), as.factor(tele_test_labels5), positive = "1")
+```
+
+
