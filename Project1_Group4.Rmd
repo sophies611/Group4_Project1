@@ -122,6 +122,146 @@ cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ```
 
 
+<<<<<<< HEAD
+=======
+### Cluster 1
+
+```{r}
+
+nrow(tele_norm)
+set.seed(12345)
+test_set <- sample(1:nrow(cluster_1), 1000) 
+teleann_train_1 <- cluster_1[-test_set,]
+teleann_test_1 <- cluster_1[test_set,]
+teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3))
+plot(teleann_model)
+
+
+
+
+
+
+```
+
+### Cluster 2
+
+```{r, cache=TRUE}
+set.seed(12345)
+test_set2 <- sample(1:nrow(cluster_2), 5000)
+tele_train_labels_2 <- cluster_2[-test_set2, "yyes"]
+tele_test_labels_2 <- cluster_2[test_set2, "yyes"]
+tele_train_2 <- cluster_2[-test_set2,]
+tele_test_2 <- cluster_2[test_set2,]
+
+#KNN
+#teleknn_model2 <- knn(train = tele_train_2, test = tele_test_2, cl = tele_train_labels2, k = sqrt(nrow(tele_train_2)))
+teleknn_model2_improved <- knn(train = tele_train_2, test = tele_test_2, cl = tele_train_labels_2, k = 5)
+CrossTable(x = tele_test_labels2, y = teleknn_model2_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels2), positive = "1")
+
+#Logistic
+tele_train_2$y <- tele_train_labels_2
+tele_test_2$y <- tele_test_labels_2
+
+tele_log_model_2 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_train_2, family = "binomial")
+predict_values_2 <- predict(tele_log_model_2, newdata=tele_test_2, type="response")
+modpred_2 <- as.factor(ifelse(predict_values_2 <= threshold, 0, 1))
+CrossTable(x = tele_test_labels_2, y = modpred_2, prop.chisq=FALSE)
+confusionMatrix(modpred_2, as.factor(tele_test_labels_2), positive = "1")
+```
+
+
+
+
+
+
+
+
+
+
+### Cluster 3
+```{r, cache=TRUE}
+set.seed(12345)
+test_set3 <- sample(1:nrow(cluster_3), 5000)
+tele_train_labels_3 <- cluster_3[-test_set3, "yyes"]
+tele_test_labels_3 <- cluster_3[test_set3, "yyes"]
+tele_train_3 <- cluster_3[-test_set3,]
+tele_test_3 <- cluster_3[test_set3,]
+
+#KNN
+#teleknn_model3 <- knn(train = tele_train_3, test = tele_test_3, cl = tele_train_labels_3, k = sqrt(nrow(tele_train_3)))
+teleknn_model3_improved <- knn(train = tele_train_3, test = tele_test_3, cl = tele_train_labels_3, k = 5)
+CrossTable(x = tele_test_labels_3, y = teleknn_model3_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3), positive = "1")
+
+#Logistic
+tele_train_3$y <- tele_train_labels_3
+tele_test_3$y <- tele_test_labels_3
+
+tele_log_model_3 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_train_3, family = "binomial")
+predict_values_3 <- predict(tele_log_model_3, newdata=tele_test_3, type="response")
+modpred_3 <- as.factor(ifelse(predict_values_3 <= threshold, 0, 1))
+CrossTable(x = tele_test_labels_3, y = modpred_3, prop.chisq=FALSE)
+confusionMatrix(modpred_3, as.factor(tele_test_labels_3), positive = "1")
+```
+
+### Cluster 4
+
+```{r}
+set.seed(12345)
+test_set4 <- sample(1:nrow(cluster_4), 5000)
+tele_train_labels_4 <- cluster_4[-test_set4, "yyes"]
+tele_test_labels_4 <- cluster_4[test_set4, "yyes"]
+tele_train_4 <- cluster_4[-test_set4,]
+tele_test_4 <- cluster_4[test_set4,]
+
+#KNN
+#teleknn_model4 <- knn(train = tele_train_4, test = tele_test_4, cl = tele_train_labels_4, k = sqrt(nrow(tele_train_4)))
+teleknn_model4_improved <- knn(train = tele_train_4, test = tele_test_4, cl = tele_train_labels_4, k = 1)
+CrossTable(x = tele_test_labels_4, y = teleknn_model4_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels_4), positive = "1")
+
+#Logistic
+tele_train_4$y <- tele_train_labels_4
+tele_test_4$y <- tele_test_labels_4
+
+tele_log_model_4 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_train_4, family = "binomial")
+predict_values_4 <- predict(tele_log_model_4, newdata=tele_test_4, type="response")
+modpred_4 <- as.factor(ifelse(predict_values_4 <= threshold, 0, 1))
+CrossTable(x = tele_test_labels_4, y = modpred_4, prop.chisq=FALSE)
+confusionMatrix(modpred_4, as.factor(tele_test_labels_4), positive = "1")
+```
+
+### Cluster 5
+
+```{r}
+set.seed(12345)
+test_set5 <- sample(1:nrow(cluster_5), 5000)
+tele_train_labels_5 <- cluster_5[-test_set5, "yyes"]
+tele_test_labels_5 <- cluster_5[test_set5, "yyes"]
+tele_train_5 <- cluster_5[-test_set5,]
+tele_test_5 <- cluster_5[test_set5,]
+
+#KNN
+#teleknn_model5 <- knn(train = tele_train_5, test = tele_test_5, cl = tele_train_labels5, k = sqrt(nrow(tele_train_5)))
+teleknn_model5_improved <- knn(train = tele_train_5, test = tele_test_5, cl = tele_train_labels_5, k = 1)
+CrossTable(x = tele_test_labels_5, y = teleknn_model5_improved, prop.chisq = FALSE)
+confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels_5), positive = "1")
+
+#Logistic
+tele_train_5$y <- tele_train_labels_5
+tele_test_5$y <- tele_test_labels_5
+
+tele_log_model_5 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_train_5, family = "binomial")
+predict_values_5 <- predict(tele_log_model_5, newdata=tele_test_5, type="response")
+modpred_5 <- as.factor(ifelse(predict_values_5 <= threshold, 0, 1))
+CrossTable(x = tele_test_labels_5, y = modpred_5, prop.chisq=FALSE)
+confusionMatrix(modpred_5, as.factor(tele_test_labels_5), positive = "1")
+```
+
+
+
+>>>>>>> a7c889c5336fb5bd5ad4f373cc5f2a31017400d6
 > Now you are ready to build your ANN model. Feel free to modify the data load, cleaning and preparation code above as per your preference.
 
 ### ANN Model
