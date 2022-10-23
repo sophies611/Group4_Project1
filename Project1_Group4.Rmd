@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Telemarketing Project
 
-Objective: For this project, we are using different regression models to predict whether the tele-marketing call will be successful or not. We created and improved each model to derive the best-performing model, as well as created five clusters to identify subsets. Subsequently, we ran each model on the clusters for evaluation.
+Objective and Method: For this project, we are using different regression models to predict whether the tele-marketing call will be successful or not. We created five clusters to identify subsets, and created and improved kNN, ANN and Logistic Regression models to derive the best-performing models. We then ran each model on the clusters for evaluation, as well as created a combined prediction using all three models using a majority voting scheme as an effort to predict the testing data and improve the prediction.
 
 
 ## Downloading and Prepping the Data
