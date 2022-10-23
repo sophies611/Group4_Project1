@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Telemarketing Project
 
-Objective: [Sophia]
+Objective: For this project, we are using different regression models to predict whether the tele-marketing call will be successful or not. We created and improved each model to derive the best-performing model, as well as created five clusters to identify subsets. Subsequently, we ran each model on the clusters for evaluation.
 
 
 ## Downloading and Prepping the Data
