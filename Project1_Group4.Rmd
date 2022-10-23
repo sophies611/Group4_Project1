@@ -119,6 +119,26 @@ cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 
 ### Cluster 1
 
+```{r}
+
+
+
+teleann_train <- tele_norm[-test_set,]
+teleann_test <- tele_norm[test_set,-match("yyes",names(tele_norm))]
+tele_train_labels <- tele_norm[-test_set, "yyes"]
+tele_test_labels <- tele_norm[test_set, "yyes"]
+teleann_model_1h <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3), threshold=0.01)
+plot(teleann_model)
+
+model_results <- compute(teleann_model, teleann_test)
+predicted_strength <- model_results$net.result
+model_results <- ifelse(predicted_strength>=threshold, 1,0) #convert thresholds
+cor(predicted_strength, tele_test_labels_2)
+CrossTable(x = tele_test_labels, y = model_results, prop.chisq = FALSE)
+confusionMatrix(as.factor(model_results), as.factor(tele_test_labels), positive = "1")
+```
+
+
 Since Cluster 1 yielded the highest call acceptance rate, we will run our models on the other 4 clusters. We then separate each cluster's data into a training and testing set, and then run each model on the training set and subsequently evaluate it on the test data. 
 
 For the KNN, we first created a base model using k equals the square root of the rows of the training dataset. While this model runs fine, we quickly realized that it has a low accuracy and Kappa. One such reason is that the data is heavily skewed. To address this concern, we decided to try lower k values until finding the best-performing models for each cluster based on accuracy, Kappa, and type I & II errors.
@@ -127,7 +147,9 @@ For the ANN, we used a learning rate of 0.01, which is the amount that the weigh
 
 For the Logistic Regression, 
 
-For both the ANN and Logistic Regression, 
+
+We also do not want to include the outcome variable in the testing data for the logistic regression and neural network so that it doesn't overperform on the test data.
+
 
 ### Cluster 2
 ```{r, cache=TRUE}
@@ -150,17 +172,18 @@ CrossTable(x = tele_test_labels_2, y = teleknn_model2_improved, prop.chisq = FAL
 confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels_2), positive = "1")
 
 #ANN
-tele_ann_train_2 <- cluster_2[-test_set2, ]
-tele_ann_train_2$yyes <- ifelse(tele_ann_train_2$yyes > 0, .9, .1) #only for ANN & logistic
+tele_train_2$yyes <- ifelse(tele_ann_train_2$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_2 <- cluster_2[test_set2,-match("yyes",names(cluster_2))]
 
-teleann_model_2 <- neuralnet(formula = yyes ~ ., data = tele_ann_train_2, hidden=c(2), threshold=0.05, stepmax=10^10, learningrate=0.01)
-plot(teleann_model_2)
-model_results <- compute(teleann_model_2, tele_ann_test_2)
+teleann_model_2 <- neuralnet(formula = yyes ~ ., data = tele_train_2, hidden=c(2), stepmax=10^100, threshold=0.05)
+ #threshold=0.05, stepmax=10^10, learningrate=0.01)
+ plot(teleann_model_2)
+ model_results <- compute(teleann_model_2, tele_ann_test_2)
 predicted_strength <- model_results$net.result
-model_results <- ifelse(predicted_strength>=threshold, 1,0) #convert thresholds
-cor(predicted_strength, tele_test_labels_2)
-CrossTable(x = tele_test_labels_2, y = model_results, prop.chisq = FALSE)
+ model_results <- ifelse(predicted_strength>=threshold, 1,0) #convert thresholds
+ cor(predicted_strength, tele_test_labels_2)
+
+ CrossTable(x = tele_test_labels_2, y = model_results, prop.chisq = FALSE)
 confusionMatrix(as.factor(model_results), as.factor(tele_test_labels_2), positive = "1")
 
 
@@ -175,7 +198,6 @@ CrossTable(x = tele_test_labels_2, y = modpred_2, prop.chisq=FALSE)
 confusionMatrix(modpred_2, as.factor(tele_test_labels_2), positive = "1")
 
 
-cluster_2_vote <- data.frame(teleknn_model2_improved, model_results, modpred_2)
 ```
 
 ### Cluster 3
@@ -202,11 +224,11 @@ confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3)
 
 #ANN
 
-tele_ann_train_3 <- cluster_3[-test_set3, ]
+
 tele_ann_train_3$yyes <- ifelse(tele_ann_train_3$yyes > 0, .9, .1) #only for ANN & logistic
 teleann_test_3 <- cluster_3[test_set3,-match("yyes",names(cluster_3))]
 
-teleann_model_3 <- neuralnet(formula = yyes ~ ., data = tele_ann_train_3, hidden=c(2), threshold=0.05, stepmax=10^10, learningrate=0.01)
+teleann_model_3 <- neuralnet(formula = yyes ~ ., data = tele_train_3, hidden=c(1), threshold=0.05, stepmax=10^10, learningrate=0.01)
 plot(teleann_model_3)
 model_results <- compute(teleann_model_3, teleann_test_3)
 predicted_strength <- model_results$net.result
@@ -250,11 +272,10 @@ confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels_4
 
 #ANN
 
-tele_ann_train_4 <- cluster_4[-test_set4, ]
 tele_ann_train_4$yyes <- ifelse(tele_ann_train_4$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_4 <- cluster_4[test_set4,-match("yyes",names(cluster_4))]
 
-teleann_model_4 <- neuralnet(formula = yyes ~ ., data = tele_ann_train_4, hidden=c(2), threshold=0.05, stepmax=10^10, learningrate=0.01)
+teleann_model_4 <- neuralnet(formula = yyes ~ ., data = tele_train_4, hidden=c(2,2), threshold=0.05, stepmax=10^100, learningrate=0.01)
 plot(teleann_model_4)
 model_results <- compute(teleann_model_4, tele_ann_test_4)
 predicted_strength <- model_results$net.result
@@ -297,11 +318,10 @@ confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels_5
 #ANN
 
 
-tele_ann_train_5 <- cluster_5[-test_set5, ]
 tele_ann_train_5$yyes <- ifelse(tele_ann_train_5$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_5 <- cluster_5[test_set5,-match("yyes",names(cluster_5))]
 
-teleann_model_5 <- neuralnet(formula = yyes ~ ., data = tele_ann_train_5, hidden=c(2), threshold=0.05, stepmax=10^10, learningrate=0.01)
+teleann_model_5 <- neuralnet(formula = yyes ~ ., data = tele_train_5, hidden=c(3), threshold=0.05, stepmax=10^100)
 plot(teleann_model_5)
 model_results <- compute(teleann_model_5, tele_ann_test_5)
 predicted_strength <- model_results$net.result
