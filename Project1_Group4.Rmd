@@ -87,7 +87,7 @@ threshold <- 0.6
 
 ## Clustering
 
-We are using the clustering method to identify and group similar data points. This way we can identify subsets to focus on calling. 
+We are using the clustering method to identify and group similar data points. This way we can identify subsets to focus on calling. We removed the outcome variable in the dataset so that the model doesn't overperform and groups based off of the predictor variables. 
 ```{r}
 set.seed(123)
 
@@ -273,6 +273,8 @@ cluster_2_vote <- data.frame(teleknn_model2_improved, model_results, modpred_2)
 ```
 
 ### Cluster 3
+
+
 ```{r, cache=TRUE}
 set.seed(12345)
 test_set3 <- sample(1:nrow(cluster_3), 1500)
