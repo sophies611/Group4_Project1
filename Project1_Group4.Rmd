@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Telemarketing Project
 
-Objective: [Sophia]
+Objective: For this project, we are using different regression models to predict whether the tele-marketing call will be successful or not. We created and improved each model to derive the best-performing model, as well as created five clusters to identify subsets. Subsequently, we ran each model on the clusters for evaluation.
 
 
 ## Downloading and Prepping the Data
@@ -117,109 +117,11 @@ cluster_4 <- tele_norm_cluster[tele_norm_cluster$cluster==4,]
 cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ```
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
-
-=======
->>>>>>> e12a0cd6b7e2060752cef213b95cd06d48601e6a
-### ANN Model
-
-Separate the normalized data into a training and test set to test the ANN model.
-```{r, cache=TRUE}
-teleann_train <- tele_norm[-test_set,]
-teleann_test <- tele_norm[test_set,-match("yyes",names(tele_norm))]
-tele_train_labels <- tele_norm[-test_set, "yyes"]
-tele_test_labels <- tele_norm[test_set, "yyes"]
-teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train)
-plot(teleann_model)
-```
-
-### Evaluate ANN Model
-```{r, cache=TRUE}
-teleann_pred <- predict(teleann_model, tele_test)
-teleann_pred <- ifelse(teleann_pred < threshold, 0, 1)
-CrossTable(x = teleann_test$yyes, y = teleann_pred, prop.chisq=FALSE)
-model1results=confusionMatrix(as.factor(teleann_pred), as.factor(teleann_test$yyes), positive = "1")
-```
-
-### Improve ANN Model
-```{r, cache=TRUE}
-#teleann_model_improved <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden = c(5,3))
-
-#teleann_model_1 <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2), threshold=0.1)
-
-#teleann_model_1a <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2,2), threshold=0.1, stepmax=10^6)
-
-#teleann_model_1b <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(1), threshold=0.1, stepmax=10^6, learningrate=0.01)
-
-#teleann_model_1c <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5), threshold=0.01)
-
-#teleann_model_1d <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,2), threshold=0.05)
-
-#teleann_model_1e <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(1,2), threshold=0.1, stepmax=10^10, learningrate=0.01)
-
-
-#teleann_model_1g <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(10,5), threshold=0.1, stepmax=10^10, learningrate=0.001)
-
-#teleann_model_1h <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3), threshold=0.01)
-```
-
-### Final ANN Model
-```{r, cache=TRUE}
-teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2), threshold=0.01, stepmax=10^10, learningrate=0.001)
-```
-
-## KNN Model & Evaluation
-```{r, cache=TRUE}
-teleknn_pred <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = sqrt(nrow(tele_train)))
-CrossTable(x = tele_test_labels, y = teleknn_pred, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive = "1")
-```
-
-## Improve KNN Model
-```{r}
-# We want to lower the k value because the data is skewed, and we ended up with k = 70 since it yields the best performing model
-teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
-CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
-confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
-<<<<<<< HEAD
-```
-=======
-<<<<<<< HEAD
-
->>>>>>> 7e3c205cbb0da085b8ad901fe555342b8221fec2
-
-## Logistic Regression
-```{r}
-str(tele)
-summary(tele)
-=======
->>>>>>> e12a0cd6b7e2060752cef213b95cd06d48601e6a
-```
-
-## Getting Train and Test Samples for logistic regression
-```{r}
-#tele_log_model <- glm(y~ age +job + education, data=tele_train_log, family="binomial")
-tele_train$y <- tele_train_labels
-tele_test$y <- tele_test_labels
-tele_log_model <- glm(y~., data = tele_train, family = "binomial")
-#summary(tele_log_model)
-predict_values <- predict(tele_log_model, newdata=tele_test, type="response")
-modpred <- as.factor(ifelse(predict_values <= threshold, 0, 1))
-CrossTable(x = tele_test_labels, y = modpred, prop.chisq=FALSE)
-confusionMatrix(modpred, as.factor(tele_test_labels), positive = "1")
-```
->>>>>>> d24a0819cddce710fb4b032cfa7bd2d6770c5bfe
-
-<<<<<<< HEAD
-=======
 ### Cluster 1
 
 Since Cluster 1 yielded the highest call acceptance rate, we will run our models on the other 4 clusters. We then separate each cluster's data into a training and testing set, and then run each model on the training set and subsequently evaluate it on the test data. 
 
-For the KNN...
+For the KNN, we first created a base model using k equals the square root of the rows of the training dataset. While this model runs fine, we quickly realized that it has a low accuracy and Kappa. One such reason is that the data is heavily skewed. To address this concern, we decided to try lower k values until finding the best-performing models for each cluster based on accuracy, Kappa, and type I & II errors.
 
 For the ANN, we used a learning rate of 0.01, which is the amount that the weights are updated during training. Setting the learning rate very low was very computationally expensive and caused our model to run very slowly. However, we also did not want to set it too high as this would cause the model to converge too quickly. Additionally, we set the threshold to be 0.05, an increase from the default 0.01 so that the model would run faster. This means that the error only needs to change by 0.05 until the model stops optimizing. Also, we set a boundary for the stepmax so that it stops converging after a set amount of iterations so our model does not fail to converge.
 
@@ -237,13 +139,17 @@ tele_train_2 <- cluster_2[-test_set2,]
 tele_test_2 <- cluster_2[test_set2,]
 
 #KNN
+#The model commented out below is the base model
 #teleknn_model2 <- knn(train = tele_train_2, test = tele_test_2, cl = tele_train_labels2, k = sqrt(nrow(tele_train_2)))
+
+#The model below is the best-performing model based on accuracy, Kappa, and type I & II errors.
 teleknn_model2_improved <- knn(train = tele_train_2, test = tele_test_2, cl = tele_train_labels_2, k = 5)
+
+#The cross table and the confusion matrix serves to analyze the KNN model
 CrossTable(x = tele_test_labels_2, y = teleknn_model2_improved, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels_2), positive = "1")
 
 #ANN
-
 tele_ann_train_2 <- cluster_2[-test_set2, ]
 tele_ann_train_2$yyes <- ifelse(tele_ann_train_2$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_2 <- cluster_2[test_set2,-match("yyes",names(cluster_2))]
@@ -284,8 +190,13 @@ tele_train_3 <- cluster_3[-test_set3,]
 tele_test_3 <- cluster_3[test_set3,]
 
 #KNN
+#The model commented out below is the base model
 #teleknn_model3 <- knn(train = tele_train_3, test = tele_test_3, cl = tele_train_labels_3, k = sqrt(nrow(tele_train_3)))
+
+#The model below is the best-performing model based on accuracy, Kappa, and type I & II errors.
 teleknn_model3_improved <- knn(train = tele_train_3, test = tele_test_3, cl = tele_train_labels_3, k = 5)
+
+#The cross table and the confusion matrix serves to analyze the KNN model
 CrossTable(x = tele_test_labels_3, y = teleknn_model3_improved, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3), positive = "1")
 
@@ -326,8 +237,13 @@ tele_train_4 <- cluster_4[-test_set4,]
 tele_test_4 <- cluster_4[test_set4,]
 
 #KNN
+#The model commented out below is the base model
 #teleknn_model4 <- knn(train = tele_train_4, test = tele_test_4, cl = tele_train_labels_4, k = sqrt(nrow(tele_train_4)))
+
+#The model below is the best-performing model based on accuracy, Kappa, and type I & II errors.
 teleknn_model4_improved <- knn(train = tele_train_4, test = tele_test_4, cl = tele_train_labels_4, k = 1)
+
+#The cross table and the confusion matrix serves to analyze the KNN model
 CrossTable(x = tele_test_labels_4, y = teleknn_model4_improved, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels_4), positive = "1")
 
@@ -367,8 +283,13 @@ tele_train_5 <- cluster_5[-test_set5,]
 tele_test_5 <- cluster_5[test_set5,]
 
 #KNN
+#The model commented out below is the base model
 #teleknn_model5 <- knn(train = tele_train_5, test = tele_test_5, cl = tele_train_labels5, k = sqrt(nrow(tele_train_5)))
+
+#The model below is the best-performing model based on accuracy, Kappa, and type I & II errors.
 teleknn_model5_improved <- knn(train = tele_train_5, test = tele_test_5, cl = tele_train_labels_5, k = 1)
+
+#The cross table and the confusion matrix serves to analyze the KNN model
 CrossTable(x = tele_test_labels_5, y = teleknn_model5_improved, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels_5), positive = "1")
 
