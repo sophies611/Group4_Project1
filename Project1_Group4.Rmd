@@ -120,9 +120,6 @@ cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ### Cluster 1
 
 ```{r}
-
-
-
 teleann_train <- tele_norm[-test_set,]
 teleann_test <- tele_norm[test_set,-match("yyes",names(tele_norm))]
 tele_train_labels <- tele_norm[-test_set, "yyes"]
@@ -188,16 +185,33 @@ confusionMatrix(as.factor(model_results), as.factor(tele_test_labels_2), positiv
 
 
 #Logistic
-tele_train_2$y <- tele_train_labels_2
-tele_test_2$y <- tele_test_labels_2
+threshold<-0.5
+tele_train_log_2 <- cluster_2[-test_set2, ]
+tele_test_log_2 <- cluster_2[test_set2, ]
+tele_train_log_2$yyes <- NULL
+tele_test_log_2$yyes <- NULL
 
-tele_log_model_2 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_ann_train_2, family = "binomial")
-predict_values_2 <- predict(tele_log_model_2, newdata=tele_ann_test_2, type="response")
-modpred_2 <- as.factor(ifelse(predict_values_2 <= threshold, 0, 1))
-CrossTable(x = tele_test_labels_2, y = modpred_2, prop.chisq=FALSE)
-confusionMatrix(modpred_2, as.factor(tele_test_labels_2), positive = "1")
+#Now the response (aka Labels)
+tele_train_labels_2 <- cluster_2[-test_set2, "yyes"]
+tele_test_labels_2 <- as.factor(cluster_2[test_set2, "yyes"])
 
+tele_train_log_2$y <- tele_train_labels_2
 
+#tele_train_log_2 <- cluster_2[-test_set2,-match('yyes',names(cluster_2))]
+#tele_test_log_2 <- cluster_2[test_set2,-match('yyes',names(cluster_2))]
+#tele_train_log_2$y <- tele_train_labels_2
+
+tele_log_model_2 <- glm(y~.-jobunknown-loanunknown-monthjun-monthmar-monthmay-monthnov-monthoct- monthsep-poutcomenonexistent-emp.var.rate -emp.var.rate -cons.price.idx-cons.conf.idx-nr.employed -pdaysdummy-maritalunknown-defaultyes-defaultunknown-cluster-poutcomesuccess-day_of_weektue-monthdec+contacttelephone*day_of_weekwed+jobhousemaid*day_of_weekwed, data =tele_train_log_2, family = "binomial")
+summary(tele_log_model_2)
+
+predict_values_2 <- predict(tele_log_model_2, newdata=tele_test_log_2, type="response")
+modpred_2 <- ifelse(predict_values_2 <= threshold, 0, 1)
+
+CrossTable(x = as.factor(tele_test_labels_2), y = as.factor(modpred_2), prop.chisq=FALSE)
+confusionMatrix(as.factor(modpred_2), as.factor(tele_test_labels_2), positive = "1")
+
+str(as.factor(modpred_2))
+str(as.factor(tele_test_labels_2))
 ```
 
 ### Cluster 3
@@ -239,12 +253,16 @@ confusionMatrix(as.factor(model_results), as.factor(tele_test_labels_3), positiv
 
 
 #Logistic
-tele_train_3$y <- tele_train_labels_3
-tele_test_3$y <- tele_test_labels_3
+tele_train_log_3 <- cluster_3[-test_set3,-match('yyes',names(cluster_3))]
+tele_test_log_3 <- cluster_3[test_set3,-match('yyes',names(cluster_3))]
+tele_train_log_3$y <- tele_train_labels_3
 
-tele_log_model_3 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_ann_train_3, family = "binomial")
-predict_values_3 <- predict(tele_log_model_3, newdata=teleann_test_3, type="response")
+tele_log_model_3 <- glm(y~.-jobunknown- maritalmarried - educationilliterate -defaultyes -loanunknown-cluster+jobunemployed*emp.var.rate + educationprofessional.course*emp.var.rate + jobadmin.*contacttelephone + jobblue.collar*contacttelephone + jobstudent*educationuniversity.degree+jobadmin.*day_of_weekmon+jobblue.collar*day_of_weekmon+jobentrepreneur*day_of_weekmon +jobstudent*day_of_weekmon+ jobstudent*monthjun, data = tele_train_log_3, family = "binomial")
+summary(tele_log_model_3)
+
+predict_values_3 <- predict(tele_log_model_3, newdata=tele_test_log_3, type="response")
 modpred_3 <- as.factor(ifelse(predict_values_3 <= threshold, 0, 1))
+
 CrossTable(x = tele_test_labels_3, y = modpred_3, prop.chisq=FALSE)
 confusionMatrix(modpred_3, as.factor(tele_test_labels_3), positive = "1")
 ```
@@ -283,14 +301,19 @@ model_results <- ifelse(predicted_strength>=threshold, 1,0) #convert thresholds
 cor(predicted_strength, tele_test_labels_4)
 CrossTable(x = tele_test_labels_4, y = model_results, prop.chisq = FALSE)
 confusionMatrix(as.factor(model_results), as.factor(tele_test_labels_4), positive = "1")
-#Logistic
-tele_train_4$y <- tele_train_labels_4
-tele_test_4$y <- tele_test_labels_4
 
-tele_log_model_4 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_ann_train_4, family = "binomial")
-predict_values_4 <- predict(tele_log_model_4, newdata=tele_ann_test_4, type="response")
+#Logistic
+tele_train_log_4 <- cluster_4[-test_set4,-match('yyes',names(cluster_4))]
+tele_test_log_4 <- cluster_4[test_set4,-match('yyes',names(cluster_4))]
+tele_train_log_4$y <- tele_train_labels_4
+
+tele_log_model_4 <- glm(y~.-jobhousemaid-jobmanagement-jobself.employed-jobstudent-jobunemployed -maritalunknown -educationilliterate-defaultyes-loanunknown-monthmar-monthsep-monthoct-monthaug-poutcomenonexistent -educationuniversity.degree + educationprofessional.course*loanyes -poutcomesuccess-cons.price.idx -cons.conf.idx -nr.employed-pdaysdummy-cluster-previous, data = tele_train_log_4,family = "binomial")
+summary(tele_log_model_4)
+
+predict_values_4 <- predict(tele_log_model_4, newdata=tele_test_log_4, type="response")
 modpred_4 <- as.factor(ifelse(predict_values_4 <= threshold, 0, 1))
-CrossTable(x = tele_test_labels_4, y = modpred_4, prop.chisq=FALSE)
+
+CrossTable(x = as.factor(tele_test_labels_4), y = modpred_4, prop.chisq=FALSE)
 confusionMatrix(modpred_4, as.factor(tele_test_labels_4), positive = "1")
 ```
 
@@ -331,13 +354,17 @@ CrossTable(x = tele_test_labels_5, y = model_results, prop.chisq = FALSE)
 confusionMatrix(as.factor(model_results), as.factor(tele_test_labels_5), positive = "1")
 
 #Logistic
-tele_train_5$y <- tele_train_labels_5
-tele_test_5$y <- tele_test_labels_5
+tele_train_log_5 <- cluster_5[-test_set5,-match('yyes',names(cluster_5))]
+tele_test_log_5 <- cluster_5[test_set5,-match('yyes',names(cluster_5))]
+tele_train_log_5$y <- tele_train_labels_5
 
-tele_log_model_5 <- glm(y~.+ maritalmarried* housingyes + educationuniversity.degree*maritalmarried, data = tele_ann_train_5, family = "binomial")
-predict_values_5 <- predict(tele_log_model_5, newdata=tele_ann_test_5, type="response")
+tele_log_model_5 <- glm(y~.-jobunknown - educationilliterate -defaultyes -loanunknown-contacttelephone-monthmar-monthoct-monthsep--poutcomenonexistent-poutcomesuccess- -cons.conf.idx-nr.employed -pdaysdummy-cluster-poutcomenonexistent-cons.conf.idx -housingyes-monthaug-monthdec-monthjul-monthjun-monthmay-monthnov-emp.var.rate-cons.price.idx-educationhigh.school-previous+jobunemployed*campaign, data = tele_train_log_5, family = "binomial")
+
+summary(tele_log_model_5)
+predict_values_5 <- predict(tele_log_model_5, newdata=tele_test_log_5, type="response")
 modpred_5 <- as.factor(ifelse(predict_values_5 <= threshold, 0, 1))
-CrossTable(x = tele_test_labels_5, y = modpred_5, prop.chisq=FALSE)
+
+CrossTable(x = as.factor(tele_test_labels_5), y = as.factor(modpred_5), prop.chisq=FALSE)
 confusionMatrix(modpred_5, as.factor(tele_test_labels_5), positive = "1")
 ```
 
