@@ -165,7 +165,6 @@ teleann_model_1h <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c
 
 ```{r, cache=TRUE}
 teleann_model <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(2), threshold=0.01, stepmax=10^10, learningrate=0.001)
-
 ```
 
 ## KNN Model & Evaluation
@@ -181,6 +180,8 @@ confusionMatrix(as.factor(teleknn_pred), as.factor(tele_test_labels), positive =
 teleknn_pred1 <- knn(train = tele_train, test = tele_test, cl = tele_train_labels, k = 70)
 CrossTable(x = tele_test_labels, y = teleknn_pred1, prop.chisq = FALSE)
 confusionMatrix(as.factor(teleknn_pred1), as.factor(tele_test_labels), positive = "1")
+```
+
 ## Logistic Regression
 ```{r}
 str(tele)
