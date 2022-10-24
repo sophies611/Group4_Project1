@@ -92,7 +92,7 @@ threshold <- 0.6
 We are using the clustering method to identify and group similar data points. This way we can identify subsets to focus on calling. We removed the outcome variable in the dataset so that the model doesn't overperform and groups based off of the predictor variables. 
 
 ```{r}
-set.seed(12345)
+set.seed(123)
 
 
 tele_norm_cluster <- tele_norm[, -match("yyes",names(tele_norm))]
@@ -144,13 +144,14 @@ Since Cluster 1 yielded the highest call acceptance rate, we will run our models
 
 For the KNN, we first created a base model using k equals the square root of the rows of the training dataset. While this model runs fine, we quickly realized that it has a low accuracy and Kappa. One such reason is that the data is heavily skewed. To address this concern, we decided to try lower k values until finding the best-performing models for each cluster based on accuracy, Kappa, and type I & II errors.
 
-For the ANN, we used a learning rate of 0.01, which is the amount that the weights are updated during training. Setting the learning rate very low was very computationally expensive and caused our model to run very slowly. However, we also did not want to set it too high as this would cause the model to converge too quickly. Additionally, we set the threshold to be 0.05, an increase from the default 0.01 so that the model would run faster. This means that the error only needs to change by 0.05 until the model stops optimizing. Also, we set a boundary for the stepmax so that it stops converging after a set amount of iterations so our model does not fail to converge. Additionally, adjusting the number of hidden layers and neurons allows us to make improvements to the model.
+For the ANN, we used a learning rate of 0.01, which is the amount that the weights are updated during training. Setting the learning rate very low was very computationally expensive and caused our model to run very slowly. However, we also did not want to set it too high as this would cause the model to converge too quickly. Additionally, we set the threshold to be 0.05, an increase from the default 0.01 so that the model would run faster. This means that the error only needs to change by 0.05 until the model stops optimizing. Also, we set a boundary for the stepmax so that it stops converging after a set amount of iterations so our model does not fail to converge. Additionally, adjusting the number of hidden layers and neurons allows us to make improvements to the model. I also varied the algorithm used to calculate the neural network.
 
 For the Logistic Regression, 
 
 
 We also do not want to include the outcome variable in the testing data for the logistic regression and neural network so that it doesn't overperform on the test data.
 
+When evaluating the model, we want to look at certain parameters. Sensitivity tells us of the people who would have been a success, how many did we call, so ideally, we want this number to be high. Additionally, we want the positive prediction rate to be higher than our baseline.
 
 ### Cluster 2
 ```{r, cache=TRUE}
@@ -173,10 +174,11 @@ CrossTable(x = tele_test_labels_2, y = teleknn_model2_improved, prop.chisq = FAL
 confusionMatrix(as.factor(teleknn_model2_improved), as.factor(tele_test_labels_2), positive = "1")
 
 #ANN
+
 tele_train_2$yyes <- ifelse(tele_ann_train_2$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_2 <- cluster_2[test_set2,-match("yyes",names(cluster_2))]
 
-teleann_model_2 <- neuralnet(formula = yyes ~ ., data = tele_train_2, hidden=c(2), stepmax=10^100, threshold=0.05)
+teleann_model_2 <- neuralnet(formula = yyes ~ ., data = tele_train_2, hidden=c(2), stepmax=10^100, threshold=0.03)
  #threshold=0.05, stepmax=10^10, learningrate=0.01)
  plot(teleann_model_2)
  model_results <- compute(teleann_model_2, tele_ann_test_2)
@@ -246,7 +248,7 @@ confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3)
 tele_ann_train_3$yyes <- ifelse(tele_ann_train_3$yyes > 0, .9, .1) #only for ANN & logistic
 teleann_test_3 <- cluster_3[test_set3,-match("yyes",names(cluster_3))]
 
-teleann_model_3 <- neuralnet(formula = yyes ~ ., data = tele_train_3, hidden=c(1), threshold=0.05, stepmax=10^10, learningrate=0.01)
+teleann_model_3 <- neuralnet(formula = yyes ~ ., data = tele_train_3, hidden=c(1), threshold=0.03, stepmax=10^10, learningrate=0.01)
 plot(teleann_model_3)
 model_results <- compute(teleann_model_3, teleann_test_3)
 predicted_strength <- model_results$net.result
@@ -297,7 +299,7 @@ confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels_4
 tele_ann_train_4$yyes <- ifelse(tele_ann_train_4$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_4 <- cluster_4[test_set4,-match("yyes",names(cluster_4))]
 
-teleann_model_4 <- neuralnet(formula = yyes ~ ., data = tele_train_4, hidden=c(2,2), threshold=0.05, stepmax=10^100, learningrate=0.01)
+teleann_model_4 <- neuralnet(formula = yyes ~ ., data = tele_train_4, hidden=c(2,2), threshold=0.03, stepmax=10^100, learningrate=0.01)
 plot(teleann_model_4)
 model_results <- compute(teleann_model_4, tele_ann_test_4)
 predicted_strength <- model_results$net.result
@@ -348,7 +350,7 @@ confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels_5
 tele_ann_train_5$yyes <- ifelse(tele_ann_train_5$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_5 <- cluster_5[test_set5,-match("yyes",names(cluster_5))]
 
-teleann_model_5 <- neuralnet(formula = yyes ~ ., data = tele_train_5, hidden=c(3), threshold=0.05, stepmax=10^100)
+teleann_model_5 <- neuralnet(formula = yyes ~ ., data = tele_train_5, hidden=c(3,2), threshold=0.03, stepmax=10^100,algorithm = "backprop")
 plot(teleann_model_5)
 model_results <- compute(teleann_model_5, tele_ann_test_5)
 predicted_strength <- model_results$net.result
