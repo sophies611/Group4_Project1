@@ -121,22 +121,7 @@ cluster_4 <- tele_norm_cluster[tele_norm_cluster$cluster==4,]
 cluster_5 <- tele_norm_cluster[tele_norm_cluster$cluster==5,]
 ```
 
-### Cluster 1
 
-```{r}
-teleann_train <- tele_norm[-test_set,]
-teleann_test <- tele_norm[test_set,-match("yyes",names(tele_norm))]
-tele_train_labels <- tele_norm[-test_set, "yyes"]
-tele_test_labels <- tele_norm[test_set, "yyes"]
-teleann_model_1h <- neuralnet(formula = yyes ~ ., data = teleann_train, hidden=c(5,3), threshold=0.01)
-plot(teleann_model)
-
-model_results <- compute(teleann_model, teleann_test)
-predicted_strength <- model_results$net.result
-model_results <- ifelse(predicted_strength>=threshold, 1,0) #convert thresholds
-cor(predicted_strength, tele_test_labels_2)
-CrossTable(x = tele_test_labels, y = model_results, prop.chisq = FALSE)
-confusionMatrix(as.factor(model_results), as.factor(tele_test_labels), positive = "1")
 ```
 
 
@@ -245,7 +230,7 @@ confusionMatrix(as.factor(teleknn_model3_improved), as.factor(tele_test_labels3)
 #ANN
 
 
-tele_ann_train_3$yyes <- ifelse(tele_ann_train_3$yyes > 0, .9, .1) #only for ANN & logistic
+tele_train_3$yyes <- ifelse(tele_train_3$yyes > 0, .9, .1) #only for ANN & logistic
 teleann_test_3 <- cluster_3[test_set3,-match("yyes",names(cluster_3))]
 
 teleann_model_3 <- neuralnet(formula = yyes ~ ., data = tele_train_3, hidden=c(1), threshold=0.03, stepmax=10^10, learningrate=0.01)
@@ -296,7 +281,7 @@ confusionMatrix(as.factor(teleknn_model4_improved), as.factor(tele_test_labels_4
 
 #ANN
 
-tele_ann_train_4$yyes <- ifelse(tele_ann_train_4$yyes > 0, .9, .1) #only for ANN & logistic
+tele_train_4$yyes <- ifelse(tele_train_4$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_4 <- cluster_4[test_set4,-match("yyes",names(cluster_4))]
 
 teleann_model_4 <- neuralnet(formula = yyes ~ ., data = tele_train_4, hidden=c(2,2), threshold=0.03, stepmax=10^100, learningrate=0.01)
@@ -347,7 +332,7 @@ confusionMatrix(as.factor(teleknn_model5_improved), as.factor(tele_test_labels_5
 #ANN
 
 
-tele_ann_train_5$yyes <- ifelse(tele_ann_train_5$yyes > 0, .9, .1) #only for ANN & logistic
+tele_train_5$yyes <- ifelse(tele_train_5$yyes > 0, .9, .1) #only for ANN & logistic
 tele_ann_test_5 <- cluster_5[test_set5,-match("yyes",names(cluster_5))]
 
 teleann_model_5 <- neuralnet(formula = yyes ~ ., data = tele_train_5, hidden=c(3,2), threshold=0.03, stepmax=10^100,algorithm = "backprop")
